@@ -2,6 +2,7 @@ import string
 import random
 
 from django.db import models
+from django.urls import reverse
 from django.utils.text import slugify
 
 
@@ -53,8 +54,8 @@ class Category(models.Model):
 
         super(Category, self).save(*args, **kwargs)
 
-    # def get_absolute_url(self):
-    #     return reverse('category_detail', kwargs={'slug': self.slug})
+    def get_absolute_url(self):
+        return reverse('shop:category_list', args=(self.slug,))
 
 
 class Product(models.Model):
@@ -77,8 +78,8 @@ class Product(models.Model):
     def __str__(self):
         return self.title
 
-    # def get_absolute_url(self):
-    #     return reverse('product_detail', kwargs={'slug': self.slug})
+    def get_absolute_url(self):
+        return reverse('shop:product_detail', args=(self.slug,))
 
 
 class ProductManager(models.Manager):
