@@ -71,7 +71,7 @@
 
                             <div class="col-6 text-end">
 
-                                <button type="button" id="add-button" value="" class="btn btn-secondary btn-sm">
+                                <button type="button" id="add-button" value="{{ product.pk }}" class="btn btn-secondary btn-sm">
 
                                 Add to cart
 
@@ -95,5 +95,28 @@
     <br>
 
 </div>
+
+<script>
+    $(document).on('click', '#add-button', function(e){
+    e.preventDefault();
+        $.ajax({
+            url: '{% url 'cart:add_to_cart' %}',
+            type: 'POST',
+            data: {
+                product_id: $('#add-button').val(),
+                product_qty: $('#select option:selected').text(),
+                csrfmiddlewaretoken: '{{csrf_token}}',
+                action: 'post'
+            },
+            success: function(response) {
+                document.getElementById('lblCartCount').textContent = response.qty
+            },
+            error: function(error) {
+                console.log(error)
+            }
+        })
+    })
+
+</script>
 
 {% endblock %}
