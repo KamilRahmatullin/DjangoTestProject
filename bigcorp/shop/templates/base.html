@@ -146,7 +146,7 @@
       class="navbar navbar-expand-lg bg-white sticky-top navbar-light p-3 shadow-sm "
     >
       <div class="container">
-        <a class="navbar-brand" href="#"
+        <a class="navbar-brand" href="{% url 'shop:products' %}"
           ><i class="fa-solid fa-shop me-2"></i>
           <strong>BigCorp SHOP</strong></a
         >
@@ -248,7 +248,7 @@
             <li class="nav-item">
               <a class="nav-link mx-2 text-uppercase" href="{% url 'cart:cart_view' %}"
                 > <i class="fa fa-shopping-cart" aria-hidden="true"> </i> Cart
-                <span id="lblCartCount" class="badge bg-warning ">
+                <span id="lblCartCount" class="badge badge-warning ">
                   {% with cart_quantity=cart|length %}
                     {% if cart_quantity > 0 %}
                       {{ cart_quantity }}

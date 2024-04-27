@@ -6,10 +6,24 @@ from django.http import JsonResponse
 
 
 def cart_view(request):
-    return render(request, 'cart/cart_view.html')
+    cart = Cart(request)
+
+    context = {
+        'cart': cart
+    }
+    return render(request, 'cart/cart_view.html', context=context)
 
 
 def cart_add(request):
+    """
+    Add a product to the cart and return a JSON response with the updated cart quantity and the product title.
+
+    Parameters:
+    - request: HttpRequest object containing the POST data with 'action', 'product_id', and 'product_qty' fields.
+
+    Returns:
+    - JsonResponse: JSON response containing the updated cart quantity and the title of the added product.
+    """
     cart = Cart(request)
 
     if request.POST.get('action') == 'post':

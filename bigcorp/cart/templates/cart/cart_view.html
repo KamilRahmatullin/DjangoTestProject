@@ -1,4 +1,4 @@
-{% include "base.html" %} {% load static %} {% block content %}
+{% include "base.html" %} {% load static %} {% load mathfilters %} {% block content %}
 
 <main class="pt-5">
   <div class="container">
@@ -6,8 +6,8 @@
 
     <hr />
 
-
-
+    {% for item in cart %}
+    {% with product=item.product %}
 
     <br />
 
@@ -26,16 +26,16 @@
           href="{{product.get_absolute_url}}"
           class="text-info text-decoration-none"
         >
-          <h1 class="h5 pt-2">title</h1>
+          <h1 class="h5 pt-2">{{product.title}}</h1>
         </a>
 
         <div class="border">
           <div class="col border-bottom">
             <div class="row p-3">
-              <div class="col-6">Product</div>
+              <div class="col-6">{{product.title}}</div>
 
               <div class="col-6 text-end">
-                <span class="h6 fw-bold">$ 99</span>
+                <span class="h6 fw-bold">$ {{product.price|mul:item.quantity  }}</span>
               </div>
             </div>
           </div>
@@ -47,8 +47,8 @@
 
                 &nbsp;
 
-                <select id="select{{product.id}}">
-                  <option selected>1</option>
+                <select id="select">
+                  <option selected>{{item.quantity}}</option>
 
                   <option value="">1</option>
 
@@ -86,11 +86,12 @@
       </div>
     </div>
 
-
+    {% endwith %}
+    {% endfor %}
 
     <div class="col-12 text-end">
       <div class="h6 fw-bold">
-        Total: $
+        Total: $ {{cart.get_total_price}}
         <div id="total" class="d-inline-flex">
 
         </div>
