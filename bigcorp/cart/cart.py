@@ -85,3 +85,30 @@ class Cart():
         This method calculates and returns the total price of all items in the cart.
         """
         return sum(Decimal(item['price']) * item['quantity'] for item in self.cart.values())
+
+    def delete(self, product):
+        """
+        Delete a product from the cart.
+
+        This method deletes the specified product from the cart. The session modification flag is set to True to indicate
+        that the session has been modified.
+        """
+        product_id = str(product.id)
+
+        if product_id in self.cart:
+            del self.cart[product_id]
+            self.session.modified = True
+
+    def update(self, product, quantity):
+        """
+        Update the quantity of a product in the cart.
+
+        This method updates the quantity of the specified product in the cart with the new quantity provided. If the product
+        is present in the cart, its quantity is updated to the new value. The session modification flag is set to True to
+        indicate that the session has been modified.
+        """
+        product_id = str(product.id)
+
+        if product_id in self.cart:
+            self.cart[product_id]['quantity'] = quantity
+            self.session.modified = True

@@ -38,8 +38,18 @@ def cart_add(request):
 
 
 def cart_update(request):
-    ...
+    cart = Cart(request)
 
 
 def cart_delete(request):
     cart = Cart(request)
+
+    if request.POST.get('action') == 'post':
+        product_id = int(request.POST.get('product_id'))
+        product = get_object_or_404(ProductProxy, id=product_id)
+        cart.delete(product=product)
+        cart_qty = cart.__len__()
+        cart_total = cart.get_total_price()
+
+        response = JsonResponse({'cart_qty': cart_qty, 'cart_total': cart_total})
+        return response
