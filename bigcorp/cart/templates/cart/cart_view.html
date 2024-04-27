@@ -47,16 +47,16 @@
 
                                 &nbsp;
 
-                                <select id="select">
+                                <select id="select{{product.id}}">
                                     <option selected>{{item.quantity}}</option>
 
-                                    <option value="">1</option>
+                                    <option value="1">1</option>
 
-                                    <option value="">2</option>
+                                    <option value="2">2</option>
 
-                                    <option value="">3</option>
+                                    <option value="3">3</option>
 
-                                    <option value="">4</option>
+                                    <option value="4">4</option>
                                 </select>
 
                                 <br/>
@@ -128,6 +128,31 @@
       })
     })
 
+    $(document).on('click', '.update-button', function(e){
+      e.preventDefault();
+
+      var product_id = $(this).data('index');
+
+      $.ajax({
+        url: '{% url 'cart:update_to_cart' %}',
+        type: 'POST',
+        data: {
+          product_id: $(this).data('index'),
+          product_qty: $('#select' + product_id + ' option:selected').text(),
+          csrfmiddlewaretoken: '{{csrf_token}}',
+          action: 'post'
+        },
+        success: function(response){
+          document.getElementById('lblCartCount').textContent = response.qty
+          document.getElementById('total').textContent = response.total
+
+          location.reload()
+        },
+        error: function(error){
+          console.log(error)
+        }
+      })
+    })
 </script>
 
 {% endblock %}

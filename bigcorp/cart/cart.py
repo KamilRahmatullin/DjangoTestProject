@@ -73,10 +73,8 @@ class Cart():
 
         if product_id not in self.cart:
             self.cart[product_id] = {'quantity': quantity, 'price': str(product.price)}
-        else:
-            self.cart[product_id]['quantity'] = quantity
-            self.cart[product_id]['price'] = str(product.price)
-            self.session.modified = True
+        self.cart[product_id]['quantity'] = quantity
+        self.session.modified = True
 
     def get_total_price(self):
         """
