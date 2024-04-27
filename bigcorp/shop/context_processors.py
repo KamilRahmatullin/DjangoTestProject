@@ -1,6 +1,4 @@
-from django.shortcuts import render
-
-from .models import Category, ProductProxy
+from .models import Category
 
 
 def categories(request):
