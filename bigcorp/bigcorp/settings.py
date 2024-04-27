@@ -21,6 +21,7 @@ INSTALLED_APPS = [
 
     # apps
     'shop.apps.ShopConfig',
+    'cart.apps.CartConfig',
 ]
 
 
@@ -51,6 +52,7 @@ TEMPLATES = [
 
                 # custom context processors
                 'shop.context_processors.categories',
+                'cart.context_processors.cart',
             ],
         },
     },
