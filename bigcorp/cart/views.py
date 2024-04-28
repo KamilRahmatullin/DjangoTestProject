@@ -20,9 +20,6 @@ def cart_add(request):
 
     Parameters:
     - request: HttpRequest object containing the POST data with 'action', 'product_id', and 'product_qty' fields.
-
-    Returns:
-    - JsonResponse: JSON response containing the updated cart quantity and the title of the added product.
     """
     cart = Cart(request)
 
@@ -38,6 +35,12 @@ def cart_add(request):
 
 
 def cart_update(request):
+    """
+    Update the quantity of a product in the cart and return a JSON response with the updated cart quantity and total price.
+
+    Parameters:
+    - request: HttpRequest object containing the POST data with 'action', 'product_id', and 'product_qty' fields.
+    """
     cart = Cart(request)
 
     if request.POST.get('action') == 'post':
@@ -53,6 +56,12 @@ def cart_update(request):
 
 
 def cart_delete(request):
+    """
+    Delete a product from the cart and return a JSON response with the updated cart quantity and total price.
+
+    Parameters:
+    - request: HttpRequest object containing the POST data with 'action' and 'product_id' fields.
+    """
     cart = Cart(request)
 
     if request.POST.get('action') == 'post':
