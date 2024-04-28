@@ -1,6 +1,8 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.core.checks import messages
 from django.shortcuts import render, redirect
-from .forms import UserCreateForm
+from .forms import UserCreateForm, LoginForm, ProfileForm
 from django_email_verification import send_email
 
 User = get_user_model()
@@ -31,3 +33,65 @@ def register_user_view(request):
     else:
         form = UserCreateForm()
     return render(request, 'account/registration/register.html', {'form': form})
+
+
+def login_user_view(request):
+    form = LoginForm()
+
+    if request.user.is_authenticated:
+        return redirect('shop:products')
+
+    if request.method == 'POST':
+
+        form = LoginForm(request.POST)
+
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                return redirect('shop:products')
+            else:
+                return redirect('account:login')
+        return redirect('account:login')
+
+    context = {
+        'form': form
+    }
+    return render(request, 'account/login/login.html', context)
+
+
+def logout_user_view(request):
+    logout(request)
+    return redirect('shop:products')
+
+
+@login_required(login_url='account:login')
+def dashboard_view(request):
+    return render(request, 'account/dashboard/dashboard.html')
+
+
+@login_required(login_url='account:login')
+def profile_view(request):
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('account:dashboard')
+    else:
+        form = ProfileForm(instance=request.user)
+    context = {
+        'form': form
+    }
+
+    return render(request, 'account/dashboard/profile_management.html', context=context)
+
+
+@login_required(login_url='account:login')
+def delete_users_view(request):
+    user = User.objects.get(id=request.user.id)
+    if request.method == 'POST':
+        user.delete()
+        return redirect('shop:products')
+    return render(request, 'account/dashboard/account_delete.html')
