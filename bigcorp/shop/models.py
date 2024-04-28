@@ -62,11 +62,11 @@ class Product(models.Model):
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='products',
                                  verbose_name='Категория')
     title = models.CharField(max_length=200, verbose_name='Название товара')
-    brand = models.CharField(max_length=200, verbose_name='Бренд')
+    brand = models.CharField(max_length=200, verbose_name='Бренд', blank=True, null=True)
     description = models.TextField(blank=True, verbose_name='Описание')
     slug = models.SlugField(max_length=200, unique=True, null=False, editable=True, verbose_name='Ссылка')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена')
-    image = models.ImageField(upload_to='products/products/%Y/%m/%d', blank=True, verbose_name='Изображение')
+    image = models.ImageField(upload_to='products/products/%Y/%m/%d', verbose_name='Изображение')
     available = models.BooleanField(default=True, verbose_name='Наличие')
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
