@@ -1,6 +1,7 @@
 from django.urls import path
 from django.shortcuts import render
-from .views import *
+from .views import register_user_view, login_user_view, logout_user_view, dashboard_view, profile_view, \
+    delete_users_view
 
 app_name = 'account'
 

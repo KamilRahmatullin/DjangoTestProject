@@ -3,6 +3,7 @@ from pathlib import Path
 import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+ENV_DIR = Path(__file__).resolve().parent.parent.parent
 
 env = environ.Env()
 env.read_env(BASE_DIR / '.env')
@@ -32,6 +33,7 @@ INSTALLED_APPS = [
     'shop.apps.ShopConfig',
     'cart.apps.CartConfig',
     'account.apps.AccountConfig',
+    'payment.apps.PaymentConfig',
 ]
 
 
