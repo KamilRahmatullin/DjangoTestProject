@@ -3,7 +3,7 @@ from decimal import Decimal
 from shop.models import ProductProxy
 
 
-class Cart():
+class Cart:
     def __init__(self, request) -> None:
         """
         Initialize the Cart object.
