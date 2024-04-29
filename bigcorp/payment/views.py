@@ -10,6 +10,17 @@ from .models import ShippingAddress, Order, OrderItem
 
 @login_required(login_url='account:login')
 def shipping(request):
+    """
+    View function for handling shipping address form submission and rendering the shipping address form page.
+
+    Returns:
+    - If the request method is 'POST' and the form is valid, it saves the shipping address and redirects to the dashboard page.
+    - If the request method is 'GET' or the form is invalid, it renders the shipping address form page with the form data.
+
+    This function retrieves the shipping address for the current user, populates the shipping address form with the retrieved data,
+    and processes the form submission. If the form is valid, it saves the shipping address and redirects to the dashboard page.
+    if the form is invalid or the request method is 'GET', it renders the shipping address form page with the form data.
+    """
     try:
         shipping_address = ShippingAddress.objects.get(user=request.user)
     except ShippingAddress.DoesNotExist:
@@ -27,7 +38,16 @@ def shipping(request):
     return render(request, 'payment/shipping.html', {'form': form})
 
 
+@login_required(login_url='account:login')
 def checkout(request):
+    """
+    View function for handling the checkout process.
+
+    This function checks if the user is authenticated and retrieves the shipping address for the user.
+    If the user is authenticated and a shipping address exists,
+    it renders the checkout page with the shipping address. If the user is not authenticated or no shipping address
+    exists, it renders the checkout page without the shipping address.
+    """
     if request.user.is_authenticated:
         shipping_address = get_object_or_404(ShippingAddress, user=request.user)
         if shipping_address:
@@ -36,6 +56,15 @@ def checkout(request):
 
 
 def complete_order(request):
+    """
+    Handles the completion of an order, including creating a new order, associating it with the user and their shipping address,
+    and creating order items for the products in the cart.
+
+    This function retrieves the user's payment and shipping information from the POST request data, creates a new shipping address
+    or retrieves an existing one, calculates the total price of the items in the cart, and then creates a new order and order items
+    based on this information. If the user is authenticated, the order is associated with the user, otherwise, it is created without
+    a user association. Finally, it returns a JSON response indicating the success of the order completion.
+    """
     if request.POST.get('action') == 'payment':
         name = request.POST.get('name')
         email = request.POST.get('email')
@@ -77,6 +106,12 @@ def complete_order(request):
 
 
 def payment_success(request):
+    """
+    View function for handling a successful payment.
+
+    This function clears the session data to remove any sensitive information related to the payment,
+    and then renders the payment success page.
+    """
     for key in list(request.session.keys()):
         del request.session[key]
     return render(request, 'payment/payment_success.html')
