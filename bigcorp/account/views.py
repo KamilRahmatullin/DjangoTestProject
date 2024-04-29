@@ -10,6 +10,14 @@ User = get_user_model()
 
 # Register user view
 def register_user_view(request):
+    """
+    View function for registering a new user.
+
+    This function handles the registration of a new user. If the request method is POST, it processes the form data,
+    creates a new user, sends an email for verification, and redirects to the 'account:email_verification'
+    page upon successful registration. If the request method is not POST,
+    it renders the 'account/registration/register.html' template with the user registration form.
+    """
     if request.method == 'POST':
         form = UserCreateForm(request.POST)
         if form.is_valid():
@@ -36,15 +44,16 @@ def register_user_view(request):
 
 
 def login_user_view(request):
+    """
+    Display the login form and authenticate user credentials.
+    """
     form = LoginForm()
 
     if request.user.is_authenticated:
         return redirect('shop:products')
 
     if request.method == 'POST':
-
         form = LoginForm(request.POST)
-
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
@@ -52,8 +61,6 @@ def login_user_view(request):
             if user.is_active:
                 login(request, user)
                 return redirect('shop:products')
-            else:
-                return redirect('account:login')
         return redirect('account:login')
 
     context = {
@@ -74,6 +81,9 @@ def dashboard_view(request):
 
 @login_required(login_url='account:login')
 def profile_view(request):
+    """
+    View function for managing user profile.
+    """
     if request.method == 'POST':
         form = ProfileForm(request.POST, instance=request.user)
         if form.is_valid():
@@ -90,6 +100,12 @@ def profile_view(request):
 
 @login_required(login_url='account:login')
 def delete_users_view(request):
+    """
+    View function for deleting the user account.
+
+    This view function allows a logged-in user to delete their account. If the request method is POST, it deletes the user account
+    and redirects to the 'shop:products' page. If the request method is not POST, it renders the 'account/dashboard/account_delete.html' template.
+    """
     user = User.objects.get(id=request.user.id)
     if request.method == 'POST':
         user.delete()

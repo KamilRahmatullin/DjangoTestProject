@@ -11,6 +11,14 @@ class UserCreateForm(UserCreationForm):
         fields = ('username', 'email', 'password1', 'password2')
 
     def __init__(self, *args, **kwargs):
+        """
+        Initializes a UserCreateForm instance.
+
+        This method initializes the UserCreateForm instance by calling the __init__ method of the parent class
+        (UserCreationForm) with the provided arguments and keyword arguments. It also customizes the form fields
+        by setting the label and required properties for the 'email' field, and removing help text for the 'username'
+        and 'password1' fields.
+        """
         super(UserCreateForm, self).__init__(*args, **kwargs)
 
         self.fields['email'].label = 'Email'
