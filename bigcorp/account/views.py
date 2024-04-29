@@ -1,9 +1,9 @@
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.core.checks import messages
 from django.shortcuts import render, redirect
-from .forms import UserCreateForm, LoginForm, ProfileForm
 from django_email_verification import send_email
+
+from .forms import UserCreateForm, LoginForm, ProfileForm
 
 User = get_user_model()
 
