@@ -1,11 +1,19 @@
+import stripe
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
+from django.urls import reverse
+from decimal import Decimal
 
 from cart.cart import Cart
 
 from .forms import ShippingAddressForm
 from .models import ShippingAddress, Order, OrderItem
+
+from django.conf import settings
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
+stripe.api_version = settings.STRIPE_API_VERSION
 
 
 @login_required(login_url='account:login')
@@ -65,7 +73,9 @@ def complete_order(request):
     based on this information. If the user is authenticated, the order is associated with the user, otherwise, it is created without
     a user association. Finally, it returns a JSON response indicating the success of the order completion.
     """
-    if request.POST.get('action') == 'payment':
+    if request.method == 'POST':
+        payment_type = request.POST.get('stripe-payment', 'yookassa-payment')
+
         name = request.POST.get('name')
         email = request.POST.get('email')
         street_address = request.POST.get('street_address')
@@ -73,36 +83,58 @@ def complete_order(request):
         city = request.POST.get('city')
         country = request.POST.get('country')
         zip_code = request.POST.get('zip_code')
-
         cart = Cart(request)
         total_price = cart.get_total_price()
 
-        shipping_address, _ = ShippingAddress.objects.get_or_create(
-            user=request.user,
-            defaults={
-                'full_name': name,
-                'email': email,
-                'street_address': street_address,
-                'apartment_address': apartment_address,
-                'city': city,
-                'country': country,
-                'zip_code': zip_code,
-            }
-        )
+        match payment_type:
+            case 'stripe-payment':
+                shipping_address, _ = ShippingAddress.objects.get_or_create(
+                    user=request.user,
+                    defaults={
+                        'full_name': name,
+                        'email': email,
+                        'street_address': street_address,
+                        'apartment_address': apartment_address,
+                        'city': city,
+                        'country': country,
+                        'zip_code': zip_code,
+                    }
+                )
+                session_data = {
+                    'mode': 'payment',
+                    'success_url': request.build_absolute_uri(reverse('payment:payment_success')),
+                    'cancel_url': request.build_absolute_uri(reverse('payment:payment_fail')),
+                    'line_items': []
+                }
 
-        if request.user.is_authenticated:
-            order = Order.objects.create(user=request.user, shipping_address=shipping_address, total_price=total_price)
+                if request.user.is_authenticated:
+                    order = Order.objects.create(user=request.user, shipping_address=shipping_address,
+                                                 total_price=total_price)
 
-            for item in cart:
-                OrderItem.objects.create(order=order, product=item['product'], price=item['price'],
-                                         quantity=item['quantity'], user=request.user)
-        else:
-            order = Order.objects.create(shipping_address=shipping_address, total_price=total_price)
+                    for item in cart:
+                        OrderItem.objects.create(order=order, product=item['product'], price=item['price'],
+                                                 quantity=item['quantity'], user=request.user)
+                        session_data['line_items'].append({
+                            'price_data': {
+                                'unit_amount': int(item['price'] * Decimal(100)),
+                                'currency': 'usd',
+                                'product_data': {
+                                    'name': item['product'].title,
+                                },
+                            },
+                            'quantity': item['quantity'],
+                        })
 
-            for item in cart:
-                OrderItem.objects.create(order=order, product=item['product'], price=item['price'],
-                                         quantity=item['quantity'])
-        return JsonResponse({'success': True})
+                        session_data['client_reference_id'] = order.id
+                        session = stripe.checkout.Session.create(**session_data)
+                        return redirect(session.url, code=303)
+                else:
+                    order = Order.objects.create(shipping_address=shipping_address, total_price=total_price)
+
+                    for item in cart:
+                        OrderItem.objects.create(order=order, product=item['product'], price=item['price'],
+                                                 quantity=item['quantity'])
+    return JsonResponse({'success': True})
 
 
 def payment_success(request):

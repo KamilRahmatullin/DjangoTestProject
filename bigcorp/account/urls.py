@@ -42,4 +42,4 @@ urlpatterns = [
          name='password_reset_complete'),
 ]
 
-# upur zvyp mrlw cleg
+
