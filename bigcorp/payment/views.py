@@ -1,4 +1,7 @@
+import uuid
+
 import stripe
+from yookassa import Configuration, Payment
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
@@ -14,6 +17,9 @@ from django.conf import settings
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 stripe.api_version = settings.STRIPE_API_VERSION
+
+Configuration.account_id = settings.YOOKASSA_SHOP_ID
+Configuration.secret_key = settings.YOOKASSA_SECRET_KEY
 
 
 @login_required(login_url='account:login')
@@ -134,7 +140,54 @@ def complete_order(request):
                     for item in cart:
                         OrderItem.objects.create(order=order, product=item['product'], price=item['price'],
                                                  quantity=item['quantity'])
-    return JsonResponse({'success': True})
+            case 'yookassa-payment':
+                idempotency_key = uuid.uuid4()
+                currency = 'RUB'
+                description = 'Товары в корзине'
+
+                payment = Payment.create({
+                    'amount': {
+                        'value': str(total_price * Decimal(93.43)),
+                        'currency': currency
+                    },
+                    'confirmation': {
+                        'type': 'redirect',
+                        'return_url': request.build_absolute_uri(reverse('payment:payment_success')),
+                    },
+                    'capture': True,
+                    'test': True,
+                    'description': description,
+                }, idempotency_key=idempotency_key)
+
+                shipping_address, _ = ShippingAddress.objects.get_or_create(
+                    user=request.user,
+                    defaults={
+                        'full_name': name,
+                        'email': email,
+                        'street_address': street_address,
+                        'apartment_address': apartment_address,
+                        'city': city,
+                        'country': country,
+                        'zip_code': zip_code,
+                    }
+                )
+
+                confirmation_url = payment.confirmation.confirmation_url
+
+                if request.user.is_authenticated:
+                    order = Order.objects.create(user=request.user, shipping_address=shipping_address,
+                                                 total_price=total_price)
+
+                    for item in cart:
+                        OrderItem.objects.create(order=order, product=item['product'], price=item['price'],
+                                                 quantity=item['quantity'], user=request.user)
+                    return redirect(confirmation_url)
+                else:
+                    order = Order.objects.create(shipping_address=shipping_address, total_price=total_price)
+
+                    for item in cart:
+                        OrderItem.objects.create(order=order, product=item['product'], price=item['price'],
+                                                 quantity=item['quantity'])
 
 
 def payment_success(request):
