@@ -19,158 +19,126 @@
 </style>
 
 
-    <body>
+<body>
 
-        <br>
+<br>
 
-        <div class="container bg-white shadow-md p-5" style="width:500px; border-radius:20px;">
+<div class="container bg-white shadow-md p-5" style="width:500px; border-radius:20px;">
 
-            <form id="form">
+    <form id="form" action="{% url 'payment:complete_order' %}" method="post">
 
-                <div>
+        <div>
 
-                    <h3> <i class="fa fa-chevron-circle-right" aria-hidden="true"></i> &nbsp; Complete your order </h3>
+            <h3><i class="fa fa-chevron-circle-right" aria-hidden="true"></i> &nbsp; Complete your order </h3>
 
-                    <p> Please enter in the relevant information below. </p>
-
-
-                    <hr>
-
-                    <br>
-
-                    <div class="form-field">
-
-                        <input class="form-control validate" id="name" type="text" placeholder="Full name*" autocomplete="off" value="{{shipping_address.full_name}}" required>
-
-                    </div>
+            <p> Please enter in the relevant information below. </p>
 
 
-                    <br>
+            <hr>
+
+            <br>
+
+            <div class="form-field">
+
+                <input class="form-control validate" id="name" type="text" placeholder="Full name*" autocomplete="off"
+                       value="{{shipping_address.full_name}}" required>
+
+            </div>
 
 
-                    <div class="form-field">
-
-                        <input class="form-control validate" id="email" type="email" placeholder="Email address*" autocomplete="off" value="{{shipping_address.email}}" required>
-
-                    </div>
+            <br>
 
 
-                    <br>
+            <div class="form-field">
+
+                <input class="form-control validate" id="email" type="email" placeholder="Email address*"
+                       autocomplete="off" value="{{shipping_address.email}}" required>
+
+            </div>
 
 
-                    <div class="form-field">
-
-                        <input class="form-control validate" id="address1" type="text" placeholder="Street address*" autocomplete="off" value="{{shipping_address.street_address}}" required>
-
-                    </div>
+            <br>
 
 
-                    <br>
+            <div class="form-field">
+
+                <input class="form-control validate" id="address1" type="text" placeholder="Street address*"
+                       autocomplete="off" value="{{shipping_address.street_address}}" required>
+
+            </div>
 
 
-                    <div class="form-field">
-
-                        <input class="form-control validate" id="address2" type="text" placeholder="Apartment address" autocomplete="off" value="{{shipping_address.apartment_address}}" required>
-
-                    </div>
+            <br>
 
 
-                    <br>
+            <div class="form-field">
+
+                <input class="form-control validate" id="address2" type="text" placeholder="Apartment address"
+                       autocomplete="off" value="{{shipping_address.apartment_address}}" required>
+
+            </div>
 
 
-                    <div class="form-field">
-
-                        <input class="form-control validate" id="city" type="text" placeholder="City*" autocomplete="off" value="{{shipping_address.city}}" required>
-
-                    </div>
+            <br>
 
 
-                    <br>
+            {% comment %}
+            <div class="form-field">
+
+                <input class="form-control validate" id="city" type="text" placeholder="City*" autocomplete="off"
+                       value="{{shipping_address.city}}" required>
+
+            </div>
+            {% endcomment %}
 
 
-                    <div class="form-field">
-
-                        <input class="form-control" id="state" type="text" placeholder="Country" autocomplete="off" value="{{shipping_address.country}}">
-
-                    </div>
+            <br>
 
 
-                    <br>
+            <div class="form-field">
+
+                <input class="form-control" id="state" type="text" placeholder="Country" autocomplete="off"
+                       value="{{shipping_address.country}}">
+
+            </div>
 
 
-                    <div class="form-field">
-
-                        <input class="form-control" id="zipcode" type="text" placeholder="Zip code (Optional)" autocomplete="off" value="{{shipping_address.zip_code}}">
-
-                    </div>
-
-                </div>
-
-                <br>
+            <br>
 
 
+            <div class="form-field">
 
-               <button id="complete-order" type="submit" class="btn btn-primary navbar-btn text-white"> &nbsp; Complete order </button>
+                <input class="form-control" id="zipcode" type="text" placeholder="Zip code (Optional)"
+                       autocomplete="off" value="{{shipping_address.zip}}">
 
-
-                <br>
-
-
-
-
-            </form>
-
+            </div>
 
         </div>
 
+        <br>
+        {% csrf_token %}
 
+
+        <button id="complete-order-stripe" type="submit" class="btn btn-primary navbar-btn text-white"
+                name="stripe-payment" value="stripe-payment"> &nbsp; Pay with Stripe
+        </button>
+        <button id="complete-order-yookassa" type="submit" class="btn btn-primary navbar-btn text-white"
+                name="yookassa-payment" value="yookassa-payment" name="yookassa-payment" value="yookassa-payment">
+            &nbsp; Pay with YooKassa
+        </button>
 
         <br>
 
 
-    </body>
+    </form>
 
 
-    <!-- Ajax integration -->
+</div>
 
 
+<br>
 
 
-<script>
-    $(document).on('submit', function(e){
-        e.preventDefault();
-
-        $.ajax({
-            type: 'POST',
-            url: '{% url "payment:complete_order" %}',
-            data: {
-                name: $('#name').val(),
-                email: $('#email').val(),
-                street_address: $('#address1').val(),
-                apartment_address: $('#address2').val(),
-                city: $('#city').val(),
-                contry: $('#state').val(),
-                zipcode: $('#zipcode').val(),
-
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                action: 'payment'
-            },
-            success: function(response){
-                window.location.replace('{% url "payment:payment_success" %}')
-
-            },
-            error: function(error){
-                window.location.replace('{% url "payment:payment_fail" %}')
-            }
-        })
-
-    })
-
-
-</script>
-
-
-
-
+</body>
 
 {% endblock %}
