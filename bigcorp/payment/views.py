@@ -71,14 +71,21 @@ def checkout(request):
 
 def complete_order(request):
     """
-    Handles the completion of an order, including creating a new order, associating it with the user and their shipping address,
-    and creating order items for the products in the cart.
+    Handles the completion of an order based on the selected payment type.
 
-    This function retrieves the user's payment and shipping information from the POST request data, creates a new shipping address
-    or retrieves an existing one, calculates the total price of the items in the cart, and then creates a new order and order items
-    based on this information. If the user is authenticated, the order is associated with the user, otherwise, it is created without
-    a user association. Finally, it returns a JSON response indicating the success of the order completion.
+    Args:
+    - request: The HTTP request object containing the POST data.
+
+    Returns:
+    - If the payment type is 'stripe-payment', it creates a new order, processes the payment using Stripe, and redirects to the payment session URL.
+    - If the payment type is 'yookassa-payment', it creates a new order, processes the payment using YooKassa, and redirects to the payment confirmation URL.
+
+    This function retrieves the payment type from the POST data and processes the order completion based on the selected payment type.
+
+    For 'stripe-payment', it creates a new order, processes the payment using Stripe, and redirects to the payment session URL.
+    For 'yookassa-payment', it creates a new order, processes the payment using YooKassa, and redirects to the payment confirmation URL.
     """
+
     if request.method == 'POST':
         payment_type = request.POST.get('stripe-payment', 'yookassa-payment')
 
