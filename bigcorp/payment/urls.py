@@ -1,4 +1,4 @@
-from .views import shipping, checkout, complete_order, payment_success, payment_fail
+from .views import shipping, checkout, complete_order, payment_success, payment_fail, admin_order_pdf
 from django.urls import path
 from .webhooks import stripe_webhook
 
@@ -11,4 +11,5 @@ urlpatterns = [
     path('payment-success/', payment_success, name='payment_success'),
     path('payment-fail/', payment_fail, name='payment_fail'),
     path('webhook-stripe/', stripe_webhook, name='webhook_stripe'),
+    path("order/<int:order_id>/pdf/", admin_order_pdf, name="admin_order_pdf"),
 ]

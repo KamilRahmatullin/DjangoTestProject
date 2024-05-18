@@ -1,18 +1,16 @@
+import os
 from pathlib import Path
-
 import environ
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-ENV_DIR = Path(__file__).resolve().parent.parent.parent
+
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 env = environ.Env()
 env.read_env(BASE_DIR / '.env')
 
-SECRET_KEY = 'django-insecure-*2ccwkj4z5oy25og1#y)79=n2qp*tf(-*e^-twzjw1_$fp#*3_'
+SECRET_KEY = env('SECRET_KEY')
 
-DEBUG = True
-
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 INSTALLED_APPS = [
@@ -76,12 +74,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'bigcorp.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
